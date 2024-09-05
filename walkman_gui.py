@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, colorchooser
 from tkinter import filedialog
 from PIL import Image, ImageTk
 
@@ -50,9 +50,9 @@ class WalkmanApp(tk.Tk):
         self.music_group.pack(side=tk.TOP, fill=tk.BOTH, padx=5, pady=5)
 
         # 创建Cool图管理的GroupBox
-        cool_image_group = ttk.LabelFrame(self, text="Cool图管理")
+        cool_image_group = tk.Frame(self)
 
-        image_list_frame = tk.Frame(cool_image_group)
+        image_list_frame = ttk.LabelFrame(cool_image_group, text="Cool图管理")
         # 创建Listbox用于显示图像文件路径
         self.image_listbox = tk.Listbox(image_list_frame)
         self.image_listbox.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
@@ -83,9 +83,47 @@ class WalkmanApp(tk.Tk):
         image_list_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
         # 创建Label用于显示图片预览
-        self.image_preview_label = tk.Label(cool_image_group)
+        control_frame = ttk.LabelFrame(cool_image_group, text="总控制台")
+
+        control_btn_row1 = tk.Frame(control_frame)
+        btn_row1_label = tk.Label(control_btn_row1, text="音乐控制:")
+        btn_row1_label.pack(side=tk.LEFT, padx=5, pady=5)
+
+        add_btn = tk.Button(control_btn_row1, text="添加", command=self.add_image)
+        add_btn.pack(side=tk.LEFT, padx=5, pady=5)
+
+        up_btn = tk.Button(control_btn_row1, text="上移", command=self.move_up)
+        up_btn.pack(side=tk.LEFT, padx=5, pady=5)
+
+        down_btn = tk.Button(control_btn_row1, text="下移", command=self.move_down)
+        down_btn.pack(side=tk.LEFT, padx=5, pady=5)
+
+        # 添加一个复选框
+        self.checkbox_var = tk.BooleanVar()  # 用于存储复选框状态的变量
+        self.checkbox = tk.Checkbutton(control_btn_row1, text="使用6:1压缩算法", variable=self.checkbox_var)
+        self.checkbox.pack(side=tk.LEFT, padx=5, pady=5)
+
+        gen_btn = tk.Button(control_btn_row1, text="生成ROM")
+        gen_btn.pack(side=tk.LEFT, padx=5, pady=5)
+        control_btn_row1.pack()
+
+        control_btn_row2 = tk.Frame(control_frame)
+        self.songTitle_var = tk.BooleanVar()  # 用于存储复选框状态的变量
+        songTitlebox = tk.Checkbutton(control_btn_row2, text="Cool图附加歌曲标题", variable=self.songTitle_var)
+        songTitlebox.pack(side=tk.LEFT, padx=5, pady=5)
+
+        color_button_label = tk.Label(control_btn_row2, text="文字颜色:")
+        color_button_label.pack(side=tk.LEFT, padx=5, pady=5)
+        # 添加颜色选择按钮
+        self.color_button = tk.Button(control_btn_row2, bg="white", text="", command=self.choose_color, width=5, bd=0)
+        self.color_button.pack(side=tk.LEFT, padx=5, pady=5)
+        control_btn_row2.pack()
+
+        self.image_preview_label = tk.Label(control_frame)
         self.set_default_black_image()
-        self.image_preview_label.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        self.image_preview_label.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+
+        control_frame.pack(side=tk.RIGHT, fill=tk.BOTH, padx=5)
 
         cool_image_group.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
@@ -112,6 +150,16 @@ class WalkmanApp(tk.Tk):
         self.add_row("file12.txt")
         self.add_row("file13.txt")
         self.add_row("file14.txt")
+
+    def choose_color(self):
+        # 弹出颜色选择器对话框
+        color_code = colorchooser.askcolor(title="选择颜色")
+
+        if color_code:
+            # 选择的颜色值返回为 (RGB, HEX)
+            selected_color = color_code[1]  # 获取 HEX 值
+            # 将颜色应用到 btn 的背景色
+            self.color_button.config(bg=selected_color)
 
     def on_mouse_wheel(self, event):
         if self.current_widget and self.current_widget_info:
