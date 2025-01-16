@@ -6,8 +6,9 @@ import re
 from threading import Thread
 from tkinter import ttk, colorchooser, filedialog, messagebox
 from PIL import Image, ImageTk, ImageDraw, ImageFont
-from subprocess import Popen
+from subprocess import Popen, STARTUPINFO, STARTF_USESHOWWINDOW
 from time import sleep
+from shutil import copyfile
 
 font_mapping = {
     "宋体": "simsun.ttc",
@@ -65,7 +66,7 @@ class WalkmanApp(tk.Tk):
         self.file_size_list1 = None
         self.music_arg_list = None
         self.proc = None
-        self.title("OpenGBA Walkman V1.0 BY 天涯 - 流云清风赞助开发")
+        self.title("OpenGBA Walkman V1.1 BY 天涯 - 清流之风赞助开发")
         self.geometry("800x600")
 
         # 禁止调整窗口大小
@@ -663,10 +664,11 @@ class WalkmanApp(tk.Tk):
         self.file_size_list2 = [0] * 20
 
         result = dll.WriteHeader(b"temp.gba", 1)
-        dll.WriteTail(1, 1)  # Close file then I can rename it
+        dll.WriteTail(1, 1)  # Close file then I can remove it
         if os.path.exists(out_path):
             os.remove(out_path)
-        os.rename("temp.gba", out_path)
+        copyfile("temp.gba", out_path)
+        os.remove("temp.gba")
 
         # 检查结果
         if not result == 0:
@@ -703,9 +705,13 @@ class WalkmanApp(tk.Tk):
             self.progressbar['value'] = i * 100 / len(self.tree.get_children())
             file_path = self.tree.item(item, 'values')[0]
 
+            startupinfo = STARTUPINFO()
+            startupinfo.dwFlags |= STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = False
+
             # 使用ffmpeg转换音乐文件为WAV格式
             self.proc = Popen(["ffmpeg", "-i", file_path, "-ar", "44100", "-ac", "1", "-map", "0:0",
-                               "-map_metadata", "-1", "-y", "temp.wav"])
+                               "-map_metadata", "-1", "-y", "temp.wav"], startupinfo=startupinfo)
             ret_val = self.proc.wait()
 
             if ret_val == 0:
