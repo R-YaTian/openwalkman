@@ -66,7 +66,7 @@ class WalkmanApp(tk.Tk):
         self.file_size_list1 = None
         self.music_arg_list = None
         self.proc = None
-        self.title("OpenGBA Walkman V1.1 BY 天涯 - 清流之风赞助开发")
+        self.title("OpenGBA Walkman V1.2 BY 天涯 - 清流之风赞助开发")
         self.geometry("800x600")
 
         # 禁止调整窗口大小
